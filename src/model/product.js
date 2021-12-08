@@ -1,7 +1,7 @@
 export default class Product {
-  constructor(name) {
+  constructor(name, price, quantity) {
     this.name = name;
-    this.price = 0;
-    this.quantity = 0;
+    this.price = price;
+    this.quantity = quantity;
   }
 }

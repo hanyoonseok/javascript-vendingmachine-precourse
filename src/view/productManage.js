@@ -1,5 +1,5 @@
 import { createElement, $, appendChilds } from '../controller/utils.js';
-import { makeProductManageTable } from '../controller/productManage.js';
+import { makeProductManageTable, addProduct } from '../controller/productManage.js';
 import { MENU } from '../model/constants.js';
 
 const createProductNameInput = menu =>
@@ -14,24 +14,31 @@ const createProductQuantityInput = menu =>
 const createProductAddButton = menu =>
   createElement({ tag: 'button', innerHTML: menu.AddButton, id: menu.AddButtonId });
 
-const makeViewContents = () => {
-  const menu = MENU('productManage');
-  const productAddTitle = createElement({ tag: 'p', innerHTML: menu.AddTitle });
+const makeProductInputs = menu => {
   const productNameInput = createProductNameInput(menu);
   const productPriceInput = createProductPriceInput(menu);
   const productQuantityInput = createProductQuantityInput(menu);
+
+  return [productNameInput, productPriceInput, productQuantityInput];
+};
+
+const makeViewContents = () => {
+  const menu = MENU('productManage');
+  const productAddTitle = createElement({ tag: 'p', innerHTML: menu.AddTitle });
+  const productInputs = makeProductInputs(menu);
   const productAddButton = createProductAddButton(menu);
   const productStatusTitle = createElement({ tag: 'p', innerHTML: menu.StatusTitle });
   const table = makeProductManageTable(menu);
-  return [
+  productAddButton.addEventListener('click', () => addProduct(table, productInputs));
+  const viewContentsArray = [
     productAddTitle,
-    productNameInput,
-    productPriceInput,
-    productQuantityInput,
+    ...productInputs,
     productAddButton,
     productStatusTitle,
     table,
   ];
+
+  return viewContentsArray;
 };
 
 export const productManageView = () => {
