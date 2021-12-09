@@ -9,7 +9,7 @@ import {
   isMultipleOf10,
 } from './utils.js';
 import Product from '../model/product.js';
-import { MENU } from '../model/constants.js';
+import { MENU, ALERT_MESSAGE } from '../model/constants.js';
 
 const makeProductName = (product, menu) =>
   createElement({
@@ -68,14 +68,32 @@ const tableRefresh = table => {
 const isProductPriceValid = (placeholder, input) =>
   isInputNumberValid(placeholder, input) && isMultipleOf10(placeholder, input);
 
+const isAlreadyExistProduct = (placeholder, input) => {
+  const allProducts = getAllData('products');
+  const isExist = allProducts.find(e => e.name === input);
+  if (isExist) {
+    alert(ALERT_MESSAGE.isAlreadyExistProduct);
+  }
+
+  return isExist;
+};
+
+const isProductNameValid = (placeholder, input) =>
+  !isBlankExist(placeholder, input) && !isAlreadyExistProduct(placeholder, input);
+
 const isProductInputsValid = (productNameInput, productPriceInput, productQuantityInput) =>
-  !isBlankExist(productNameInput.placeholder, productNameInput.value) &&
+  isProductNameValid(productNameInput.placeholder, productNameInput.value) &&
   isProductPriceValid(productPriceInput.placeholder, productPriceInput.value) &&
   isInputNumberValid(productQuantityInput.placeholder, productQuantityInput.value);
 
+const initInputs = (productNameInput, productPriceInput, productQuantityInput) => {
+  productNameInput.value = '';
+  productPriceInput.value = '';
+  productQuantityInput.value = '';
+};
+
 export const addProduct = (table, productNameInput, productPriceInput, productQuantityInput) => {
   const allProducts = getAllData('products');
-
   if (isProductInputsValid(productNameInput, productPriceInput, productQuantityInput)) {
     const productObject = new Product(
       productNameInput.value,
@@ -85,5 +103,6 @@ export const addProduct = (table, productNameInput, productPriceInput, productQu
     allProducts.push(productObject);
     setAllData(allProducts, 'products');
     tableRefresh(table);
+    initInputs(productNameInput, productPriceInput, productQuantityInput);
   }
 };
