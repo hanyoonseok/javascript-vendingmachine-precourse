@@ -34,7 +34,7 @@ export const appendChilds = (parent, childs) => childs.forEach(child => parent.a
 
 export const getAllData = key => JSON.parse(localStorage.getItem(key)) || [];
 
-export const setAllData = (allData, key) => localStorage.setItem(key, JSON.stringify(allData));
+export const setAllData = (key, allData) => localStorage.setItem(key, JSON.stringify(allData));
 
 export const isBlankExist = (name, input) => {
   const isIncludeBlank = input === '' || input.includes(' ');

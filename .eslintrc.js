@@ -20,6 +20,7 @@ module.exports = {
     'import/extensions': 'off',
     'class-methods-use-this': 'off',
     'no-param-reassign': 'off',
+    'no-return-assign': 'off',
     'prettier/prettier': [
       'error',
       {

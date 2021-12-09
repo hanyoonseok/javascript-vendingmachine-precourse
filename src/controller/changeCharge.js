@@ -1,14 +1,17 @@
-import { createElement, appendChilds, getAllData } from './utils.js';
+import { createElement, appendChilds, setAllData } from './utils.js';
 import { tableTemplate, makeTableHeader } from './template.js';
 import { MENU } from '../model/constants.js';
+import VendingMachine from '../model/vendingMachine.js';
+
+const getVendingMachine = () => JSON.parse(localStorage.getItem('vendingMachine'));
 
 const makeVendingMachineRow = vendingMachine =>
-  vendingMachine.map(row => {
+  vendingMachine.coins.map(row => {
     const trTag = createElement({ tag: 'tr' });
     const coin = createElement({ tag: 'td', innerHTML: `${row.coin}원` });
     const quantity = createElement({
       tag: 'td',
-      innerHTML: row.quantity,
+      innerHTML: `${row.quantity}개`,
       className: `vending-machine-coin-${row.coin}-quantity`,
     });
     appendChilds(trTag, [coin, quantity]);
@@ -18,8 +21,7 @@ const makeVendingMachineRow = vendingMachine =>
 
 const makeEmptyRow = () => {
   const coinArray = [500, 100, 50, 10];
-
-  return coinArray.map(won => {
+  const emptyRows = coinArray.map(won => {
     const trTag = createElement({ tag: 'tr' });
     const coin = createElement({ tag: 'td', innerHTML: `${won}원` });
     const empty = createElement({
@@ -31,10 +33,12 @@ const makeEmptyRow = () => {
 
     return trTag;
   });
+
+  return emptyRows;
 };
 
 const makeTableRows = () => {
-  const vendingMachine = localStorage.getItem('vendingMachine');
+  const vendingMachine = getVendingMachine();
   let tableRows;
   if (vendingMachine) {
     tableRows = makeVendingMachineRow(vendingMachine);
@@ -54,7 +58,7 @@ export const makeChangeChargeTable = menu => {
 };
 
 const tableRefresh = table => {
-  const menu = MENU('productManage');
+  const menu = MENU('changeCharge');
   const tableHeader = makeTableHeader(menu);
   const tableRows = makeTableRows(menu);
 
@@ -75,11 +79,23 @@ const makeRandomAmount = inputValue => {
   if (inputValue !== 0) {
     amountArray[3] += inputValue / 10;
   }
-console.log(amountArray)
+
   return amountArray;
 };
 
-export const chargeCoin = (table, inputValue) => {
-  const vendingMachine = localStorage.getItem('vendingMachine');
-  const randomAmount = makeRandomAmount(parseInt(inputValue, 10));
+export const chargeCoin = (table, input, chargeAmountValue) => {
+  const vendingMachine = getVendingMachine();
+  const randomAmount = makeRandomAmount(parseInt(input.value, 10));
+  if (vendingMachine) {
+    randomAmount.forEach((v, i) => (vendingMachine.coins[i].quantity += v));
+    vendingMachine.change = parseInt(vendingMachine.change, 10) + parseInt(input.value, 10);
+    setAllData('vendingMachine', vendingMachine);
+  } else if (vendingMachine === null) {
+    const newMachine = new VendingMachine(input.value);
+    randomAmount.forEach((v, i) => (newMachine.coins[i].quantity += v));
+    setAllData('vendingMachine', newMachine);
+  }
+  chargeAmountValue.innerHTML = getVendingMachine().change;
+  input.value = '';
+  tableRefresh(table);
 };

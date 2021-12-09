@@ -101,7 +101,7 @@ export const addProduct = (table, productNameInput, productPriceInput, productQu
       parseInt(productQuantityInput.value, 10),
     );
     allProducts.push(productObject);
-    setAllData(allProducts, 'products');
+    setAllData('products', allProducts);
     tableRefresh(table);
     initInputs(productNameInput, productPriceInput, productQuantityInput);
   }
