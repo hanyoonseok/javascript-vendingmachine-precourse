@@ -1,6 +1,6 @@
 import { $, appendChilds } from '../controller/utils.js';
 import { productManageView } from './productManage.js';
-import chargeChangeView from './chargeChange.js';
+import changeChargeView from './changeCharge.js';
 import productPurchaseView from './productPurchase.js';
 
 export const showViewByName = buttonName => {
@@ -9,7 +9,7 @@ export const showViewByName = buttonName => {
   if (buttonName === 'productManage') {
     productManageView();
   } else if (buttonName === 'changeCharge') {
-    chargeChangeView();
+    changeChargeView();
   } else if (buttonName === 'productPurchase') {
     productPurchaseView();
   }
