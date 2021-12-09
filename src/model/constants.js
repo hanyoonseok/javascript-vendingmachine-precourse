@@ -58,3 +58,9 @@ export const MENU = name => {
 
   return Info.find(e => e.name === name);
 };
+
+export const ALERT_MESSAGE = {
+  isNotPositiveNumber: '1이상의 정수를 입력해주세요.',
+  isBlank: '공백을 제거해주세요',
+  isNotMultipleOf10: '10의 배수를 입력해주세요.',
+};
