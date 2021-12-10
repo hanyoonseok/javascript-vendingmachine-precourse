@@ -1,9 +1,13 @@
-import { createElement, appendChilds, setAllData } from './utils.js';
+import {
+  createElement,
+  appendChilds,
+  setAllData,
+  getItemOrNull,
+  isInputNumberValid,
+} from './utils.js';
 import { tableTemplate, makeTableHeader } from './template.js';
-import { MENU } from '../model/constants.js';
+import { MENU, COIN_ARRAY } from '../model/constants.js';
 import VendingMachine from '../model/vendingMachine.js';
-
-const getVendingMachine = () => JSON.parse(localStorage.getItem('vendingMachine'));
 
 const makeVendingMachineRow = vendingMachine =>
   vendingMachine.coins.map(row => {
@@ -20,8 +24,7 @@ const makeVendingMachineRow = vendingMachine =>
   });
 
 const makeEmptyRow = () => {
-  const coinArray = [500, 100, 50, 10];
-  const emptyRows = coinArray.map(won => {
+  const emptyRows = COIN_ARRAY.map(won => {
     const trTag = createElement({ tag: 'tr' });
     const coin = createElement({ tag: 'td', innerHTML: `${won}원` });
     const empty = createElement({
@@ -38,7 +41,7 @@ const makeEmptyRow = () => {
 };
 
 const makeTableRows = () => {
-  const vendingMachine = getVendingMachine();
+  const vendingMachine = getItemOrNull('vendingMachine');
   let tableRows;
   if (vendingMachine) {
     tableRows = makeVendingMachineRow(vendingMachine);
@@ -68,8 +71,7 @@ const tableRefresh = table => {
 };
 
 const makeRandomAmount = inputValue => {
-  const array = [500, 100, 50, 10];
-  const amountArray = array.map(coin => {
+  const amountArray = COIN_ARRAY.map(coin => {
     let randomNumber = 0;
     const range = Array.from({ length: inputValue / coin + 1 }, (v, i) => i);
     randomNumber = MissionUtils.Random.pickNumberInList(range);
@@ -83,19 +85,23 @@ const makeRandomAmount = inputValue => {
   return amountArray;
 };
 
-export const chargeCoin = (table, input, chargeAmountValue) => {
-  const vendingMachine = getVendingMachine();
-  const randomAmount = makeRandomAmount(parseInt(input.value, 10));
-  if (vendingMachine) {
+const initDomProperty = (chargeAmountValue, chargeInput) => {
+  chargeAmountValue.innerHTML = getItemOrNull('vendingMachine').change;
+  chargeInput.value = '';
+};
+
+export const chargeCoin = (table, chargeInput, chargeAmountValue) => {
+  if (isInputNumberValid(chargeInput.placeholder, chargeInput.value)) {
+    let vendingMachine = getItemOrNull('vendingMachine');
+    const randomAmount = makeRandomAmount(parseInt(chargeInput.value));
+    if (vendingMachine) {
+      vendingMachine.change = parseInt(vendingMachine.change) + parseInt(chargeInput.value);
+    } else if (vendingMachine === null) {
+      vendingMachine = new VendingMachine(chargeInput.value);
+    }
     randomAmount.forEach((v, i) => (vendingMachine.coins[i].quantity += v));
-    vendingMachine.change = parseInt(vendingMachine.change, 10) + parseInt(input.value, 10);
     setAllData('vendingMachine', vendingMachine);
-  } else if (vendingMachine === null) {
-    const newMachine = new VendingMachine(input.value);
-    randomAmount.forEach((v, i) => (newMachine.coins[i].quantity += v));
-    setAllData('vendingMachine', newMachine);
+    initDomProperty(chargeAmountValue, chargeInput);
+    tableRefresh(table);
   }
-  chargeAmountValue.innerHTML = getVendingMachine().change;
-  input.value = '';
-  tableRefresh(table);
 };

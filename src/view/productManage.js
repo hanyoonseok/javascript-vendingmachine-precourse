@@ -1,4 +1,4 @@
-import { createElement, $, appendChilds } from '../controller/utils.js';
+import { createElement, $, appendChilds, onKeyUpNumericEvent } from '../controller/utils.js';
 import { makeProductManageTable, addProduct } from '../controller/productManage.js';
 import { MENU } from '../model/constants.js';
 
@@ -12,9 +12,7 @@ const createProductPriceInput = menu => {
     placeholder: '가격',
     id: menu.priceInputId,
   });
-  productPriceInput.addEventListener('keyup', () => {
-    productPriceInput.value = productPriceInput.value.replace(/[^0-9]/g, '');
-  });
+  productPriceInput.addEventListener('keyup', () => onKeyUpNumericEvent(productPriceInput));
 
   return productPriceInput;
 };
@@ -26,9 +24,7 @@ const createProductQuantityInput = menu => {
     placeholder: '수량',
     id: menu.quantityInputId,
   });
-  productQuantityInput.addEventListener('keyup', () => {
-    productQuantityInput.value = productQuantityInput.value.replace(/[^0-9]/g, '');
-  });
+  productQuantityInput.addEventListener('keyup', () => onKeyUpNumericEvent(productQuantityInput));
 
   return productQuantityInput;
 };

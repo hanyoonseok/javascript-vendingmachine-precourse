@@ -2,7 +2,7 @@ import { tableTemplate, makeTableHeader } from './template.js';
 import {
   appendChilds,
   createElement,
-  getAllData,
+  getItemOrEmptyArray,
   setAllData,
   isBlankExist,
   isInputNumberValid,
@@ -33,7 +33,7 @@ const makeProductQuantity = (product, menu) =>
   });
 
 const makeTableRows = menu => {
-  const allProducts = getAllData('products');
+  const allProducts = getItemOrEmptyArray('products');
   const tableRows = allProducts.map(product => {
     const trTag = createElement({ tag: 'tr', className: menu.manageItemClass });
     const productName = makeProductName(product, menu);
@@ -69,7 +69,7 @@ const isProductPriceValid = (placeholder, input) =>
   isInputNumberValid(placeholder, input) && isMultipleOf10(placeholder, input);
 
 const isAlreadyExistProduct = (placeholder, input) => {
-  const allProducts = getAllData('products');
+  const allProducts = getItemOrEmptyArray('products');
   const isExist = allProducts.find(e => e.name === input);
   if (isExist) {
     alert(ALERT_MESSAGE.isAlreadyExistProduct);
@@ -93,12 +93,12 @@ const initInputs = (productNameInput, productPriceInput, productQuantityInput) =
 };
 
 export const addProduct = (table, productNameInput, productPriceInput, productQuantityInput) => {
-  const allProducts = getAllData('products');
+  const allProducts = getItemOrEmptyArray('products');
   if (isProductInputsValid(productNameInput, productPriceInput, productQuantityInput)) {
     const productObject = new Product(
       productNameInput.value,
-      parseInt(productPriceInput.value, 10),
-      parseInt(productQuantityInput.value, 10),
+      parseInt(productPriceInput.value),
+      parseInt(productQuantityInput.value),
     );
     allProducts.push(productObject);
     setAllData('products', allProducts);

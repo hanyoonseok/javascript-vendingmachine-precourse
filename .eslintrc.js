@@ -21,6 +21,7 @@ module.exports = {
     'class-methods-use-this': 'off',
     'no-param-reassign': 'off',
     'no-return-assign': 'off',
+    radix: 'off',
     'prettier/prettier': [
       'error',
       {

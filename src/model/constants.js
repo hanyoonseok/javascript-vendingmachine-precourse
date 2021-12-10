@@ -70,3 +70,5 @@ export const ALERT_MESSAGE = {
   isNotMultipleOf10: '10의 배수를 입력해주세요.',
   isAlreadyExistProduct: '이미 존재하는 상품입니다.',
 };
+
+export const COIN_ARRAY = [500, 100, 50, 10];
