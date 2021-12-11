@@ -1,4 +1,10 @@
-import { $, appendChilds, createElement, getItemOrNull } from '../controller/utils.js';
+import {
+  $,
+  appendChilds,
+  createElement,
+  getItemOrNull,
+  onKeyUpNumericEvent,
+} from '../controller/utils.js';
 import {
   makeProductStatusTable,
   makeReturnTable,
@@ -15,6 +21,7 @@ const makeChargeInput = menu => {
     placeholder: '투입할 금액',
     id: menu.chargeInputId,
   });
+  chargeInput.addEventListener('keyup', () => onKeyUpNumericEvent(chargeInput));
 
   return chargeInput;
 };

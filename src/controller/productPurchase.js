@@ -7,8 +7,10 @@ import {
   getItemOrEmptyArray,
   getItemOrNull,
   setAllData,
+  isInputNumberValid,
+  isMultipleOf10,
 } from './utils.js';
-import { COIN_ARRAY, MENU } from '../model/constants.js';
+import { COIN_ARRAY, MENU, ALERT_MESSAGE } from '../model/constants.js';
 
 const setChargeInput = chargeInput => localStorage.setItem('chargeInput', chargeInput);
 
@@ -83,17 +85,40 @@ const refreshProductStatusTable = table => {
   setAllPurchaseButtonEvent();
 };
 
+const isEnoughCoin = (chargeInput, price) => {
+  const isEnough = chargeInput >= price;
+  if (!isEnough) {
+    alert(ALERT_MESSAGE.isNotEnoughCoin);
+  }
+
+  return isEnough;
+};
+
+const isEnoughQuantity = quantity => {
+  const isEnough = quantity > 0;
+  if (!isEnough) {
+    alert(ALERT_MESSAGE.isNotEnoughQuantity);
+  }
+
+  return isEnough;
+};
+
 const purchaseProduct = button => {
   const allProducts = getItemOrNull('products');
   let chargeInput = getItemOrNull('chargeInput');
   const selectedProduct = allProducts.find(e => e.name === button.dataset.productName);
-  selectedProduct.quantity -= 1;
-  chargeInput -= selectedProduct.price;
-  setChargeInput(chargeInput);
-  setAllData('products', allProducts);
+  if (
+    isEnoughCoin(chargeInput, selectedProduct.price) &&
+    isEnoughQuantity(selectedProduct.quantity)
+  ) {
+    selectedProduct.quantity -= 1;
+    chargeInput -= selectedProduct.price;
+    setChargeInput(chargeInput);
+    setAllData('products', allProducts);
 
-  const table = button.parentNode.parentElement;
-  refreshProductStatusTable(table);
+    const table = button.parentNode.parentElement;
+    refreshProductStatusTable(table);
+  }
 };
 
 export const setAllPurchaseButtonEvent = () => {
@@ -142,14 +167,17 @@ const getCount = x => {
     coin: x.coin,
     quantity: 0,
   };
-  let div = chargeInput / x.coin;
-  if (div > x.quantity) {
-    div = x.quantity;
+  const div = Math.trunc(chargeInput / x.coin);
+  if (div <= x.quantity && chargeInput >= x.coin) {
+    chargeInput -= x.coin * div;
+    x.quantity -= div;
+    count.quantity = div;
+  } else if (div > x.quantity && chargeInput >= x.coin) {
+    chargeInput -= x.coin * x.quantity;
+    count.quantity = x.quantity;
+    x.quantity = 0;
   }
-  chargeInput -= x.coin * div;
-  x.quantity -= div;
   setChargeInput(chargeInput);
-  count.quantity = div;
 
   return count;
 };
@@ -178,7 +206,7 @@ const makeReturnTableRow = minimunCoinArray =>
 
 const refreshReturnTable = (returnTable, minimunCoinArray) => {
   const menu = MENU('return');
-  const purchaseMenu = MENU('productPurchase')
+  const purchaseMenu = MENU('productPurchase');
   const tableHeader = makeTableHeader(menu);
   const tableRows = makeReturnTableRow(minimunCoinArray);
   returnTable.innerHTML = '';
@@ -197,14 +225,19 @@ const initDomProperty = (chargeInputDom, chargeAmountValue) => {
   chargeAmountValue.innerHTML = getItemOrNull('chargeInput');
 };
 
+const isChargeInputDomValid = chargeInputDom =>
+  isMultipleOf10(chargeInputDom.placeholder, chargeInputDom.value) &&
+  isInputNumberValid(chargeInputDom.placeholder, chargeInputDom.value);
+
 export const addChargeInput = (chargeInputDom, chargeAmountValue) => {
-  // 유효성 검사 필요
-  let chargeInput = getItemOrNull('chargeInput');
-  if (chargeInput) {
-    chargeInput += parseInt(chargeInputDom.value);
-  } else if (chargeInput === null) {
-    chargeInput = parseInt(chargeInputDom.value);
+  if (isChargeInputDomValid(chargeInputDom)) {
+    let chargeInput = getItemOrNull('chargeInput');
+    if (chargeInput) {
+      chargeInput += parseInt(chargeInputDom.value);
+    } else if (chargeInput === null || chargeInput === 0) {
+      chargeInput = parseInt(chargeInputDom.value);
+    }
+    setChargeInput(chargeInput);
+    initDomProperty(chargeInputDom, chargeAmountValue);
   }
-  setChargeInput(chargeInput);
-  initDomProperty(chargeInputDom, chargeAmountValue);
 };
