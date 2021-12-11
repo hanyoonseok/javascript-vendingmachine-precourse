@@ -4,6 +4,7 @@ import {
   setAllData,
   getItemOrNull,
   isInputNumberValid,
+  isMultipleOf10,
 } from './utils.js';
 import { tableTemplate, makeTableHeader } from './template.js';
 import { MENU, COIN_ARRAY } from '../model/constants.js';
@@ -16,7 +17,7 @@ const makeVendingMachineRow = vendingMachine =>
     const quantity = createElement({
       tag: 'td',
       innerHTML: `${row.quantity}개`,
-      className: `vending-machine-coin-${row.coin}-quantity`,
+      id: `vending-machine-coin-${row.coin}-quantity`,
     });
     appendChilds(trTag, [coin, quantity]);
 
@@ -30,7 +31,7 @@ const makeEmptyRow = () => {
     const empty = createElement({
       tag: 'td',
       innerHTML: '',
-      className: `vending-machine-coin-${won}-quantity`,
+      id: `vending-machine-coin-${won}-quantity`,
     });
     appendChilds(trTag, [coin, empty]);
 
@@ -90,8 +91,12 @@ const initDomProperty = (chargeAmountValue, chargeInput) => {
   chargeInput.value = '';
 };
 
+const isChargeInputValid = chargeInput =>
+  isMultipleOf10(chargeInput.placeholder, chargeInput.value) &&
+  isInputNumberValid(chargeInput.placeholder, chargeInput.value);
+
 export const chargeCoin = (table, chargeInput, chargeAmountValue) => {
-  if (isInputNumberValid(chargeInput.placeholder, chargeInput.value)) {
+  if (isChargeInputValid(chargeInput)) {
     let vendingMachine = getItemOrNull('vendingMachine');
     const randomAmount = makeRandomAmount(parseInt(chargeInput.value));
     if (vendingMachine) {

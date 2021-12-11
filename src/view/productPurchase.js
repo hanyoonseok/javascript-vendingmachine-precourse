@@ -49,7 +49,11 @@ const makeChargeAmountValue = (chargeAmount, menu) => {
 };
 
 const makeReturnButton = (returnTable, menu) => {
-  const returnButton = createElement({ tag: 'button', innerHTML: menu.coinReturnButton });
+  const returnButton = createElement({
+    tag: 'button',
+    innerHTML: menu.coinReturnButton,
+    id: menu.coinReturnButtonId,
+  });
   returnButton.addEventListener('click', () => returnChanges(returnTable));
 
   return returnButton;

@@ -74,7 +74,13 @@ const makeProductStatusTableRows = menu => {
   return tableRows;
 };
 
+const removeSoldoutProduct = () => {
+  const removedProducts = getItemOrEmptyArray('products').filter(e => e.quantity !== 0);
+  setAllData('products', removedProducts);
+};
+
 const refreshProductStatusTable = table => {
+  removeSoldoutProduct();
   const menu = MENU('productPurchase');
   const tableHeader = makeTableHeader(menu);
   const tableRows = makeProductStatusTableRows(menu);
@@ -94,23 +100,11 @@ const isEnoughCoin = (chargeInput, price) => {
   return isEnough;
 };
 
-const isEnoughQuantity = quantity => {
-  const isEnough = quantity > 0;
-  if (!isEnough) {
-    alert(ALERT_MESSAGE.isNotEnoughQuantity);
-  }
-
-  return isEnough;
-};
-
 const purchaseProduct = button => {
   const allProducts = getItemOrNull('products');
   let chargeInput = getItemOrNull('chargeInput');
   const selectedProduct = allProducts.find(e => e.name === button.dataset.productName);
-  if (
-    isEnoughCoin(chargeInput, selectedProduct.price) &&
-    isEnoughQuantity(selectedProduct.quantity)
-  ) {
+  if (isEnoughCoin(chargeInput, selectedProduct.price)) {
     selectedProduct.quantity -= 1;
     chargeInput -= selectedProduct.price;
     setChargeInput(chargeInput);
@@ -143,7 +137,7 @@ const makeReturnTableEmptyRows = () => {
     const empty = createElement({
       tag: 'td',
       innerHTML: '',
-      className: `vending-machine-coin-${won}-quantity`,
+      className: `coin-${won}-quantity`,
     });
     appendChilds(trTag, [coin, empty]);
 
@@ -198,6 +192,7 @@ const makeReturnTableRow = minimunCoinArray =>
     const quantity = createElement({
       tag: 'td',
       innerHTML: `${row.quantity}개`,
+      className: `coin-${row.coin}-quantity`,
     });
     appendChilds(trTag, [coin, quantity]);
 

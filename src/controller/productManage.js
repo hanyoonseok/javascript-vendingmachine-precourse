@@ -15,21 +15,21 @@ const makeProductName = (product, menu) =>
   createElement({
     tag: 'td',
     innerHTML: product.name,
-    class: menu.manageItemNameClass,
+    className: menu.manageItemNameClass,
   });
 
 const makeProductPrice = (product, menu) =>
   createElement({
     tag: 'td',
     innerHTML: product.price,
-    class: menu.manageItemPriceClass,
+    className: menu.manageItemPriceClass,
   });
 
 const makeProductQuantity = (product, menu) =>
   createElement({
     tag: 'td',
     innerHTML: product.quantity,
-    class: menu.manageItemQuantityClass,
+    className: menu.manageItemQuantityClass,
   });
 
 const makeTableRows = menu => {
