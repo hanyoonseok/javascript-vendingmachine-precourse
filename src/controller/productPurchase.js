@@ -115,3 +115,20 @@ export const makeReturnTable = menu => {
 
   return table;
 };
+
+const initDomProperty = (chargeInputDom, chargeAmountValue) => {
+  chargeInputDom.value = '';
+  chargeAmountValue.innerHTML = getItemOrNull('chargeInput');
+};
+
+export const addChargeInput = (chargeInputDom, chargeAmountValue) => {
+  // 유효성 검사 필요
+  let chargeInput = getItemOrNull('chargeInput');
+  if (chargeInput) {
+    chargeInput += parseInt(chargeInputDom.value);
+  } else if (chargeInput === null) {
+    chargeInput = parseInt(chargeInputDom.value);
+  }
+  localStorage.setItem('chargeInput', chargeInput);
+  initDomProperty(chargeInputDom, chargeAmountValue);
+};

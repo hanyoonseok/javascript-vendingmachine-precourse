@@ -1,5 +1,5 @@
 import { $, appendChilds, createElement, getItemOrNull } from '../controller/utils.js';
-import { makeProductStatusTable, makeReturnTable } from '../controller/productPurchase.js';
+import { makeProductStatusTable, makeReturnTable, addChargeInput } from '../controller/productPurchase.js';
 import { MENU } from '../model/constants.js';
 
 const makeChargeInput = menu => {
@@ -13,12 +13,13 @@ const makeChargeInput = menu => {
   return chargeInput;
 };
 
-const makeChargeButton = menu => {
+const makeChargeButton = (chargeInput, chargeAmountValue, menu) => {
   const chargeButton = createElement({
     tag: 'button',
     innerHTML: menu.chargeButton,
     id: menu.chargeButtonId,
   });
+  chargeButton.addEventListener('click', () => addChargeInput(chargeInput, chargeAmountValue));
 
   return chargeButton;
 };
@@ -30,6 +31,8 @@ const makeChargeAmountValue = (chargeAmount, menu) => {
     chargeAmountValue.innerHTML = chargeInput;
   }
   chargeAmount.appendChild(chargeAmountValue);
+
+  return chargeAmountValue;
 };
 
 const makeReturnButton = menu => {
@@ -43,9 +46,9 @@ const makeViewContents = () => {
   const returnMenu = MENU('return');
   const chargeInputTitle = createElement({ tag: 'p', innerHTML: menu.chargeInputTitle });
   const chargeInput = makeChargeInput(menu);
-  const chargeButton = makeChargeButton(menu);
   const chargeAmount = createElement({ tag: 'div', innerHTML: menu.chargeAmount });
-  makeChargeAmountValue(chargeAmount, menu);
+  const chargeAmountValue = makeChargeAmountValue(chargeAmount, menu);
+  const chargeButton = makeChargeButton(chargeInput, chargeAmountValue, menu);
   const productStatusTitle = createElement({ tag: 'p', innerHTML: menu.productStatusTitle });
   const productStatusTable = makeProductStatusTable(menu);
   const returnTitle = createElement({ tag: 'p', innerHTML: returnMenu.returnTitle });
