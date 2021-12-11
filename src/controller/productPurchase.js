@@ -1,27 +1,49 @@
-import { makeTableHeader, tableTemplate } from './template.js';
-import { createElement, appendChilds, getItemOrEmptyArray, getItemOrNull } from './utils.js';
-import { COIN_ARRAY } from '../model/constants.js';
+import { tableTemplate, makeTableHeader } from './template.js';
+import {
+  $,
+  selectAll,
+  createElement,
+  appendChilds,
+  getItemOrEmptyArray,
+  getItemOrNull,
+  setAllData,
+} from './utils.js';
+import { COIN_ARRAY, MENU } from '../model/constants.js';
 
-const makeProductName = (product, menu) =>
-  createElement({
+const setChargeInput = chargeInput => localStorage.setItem('chargeInput', chargeInput);
+
+const makeProductName = (product, menu) => {
+  const productName = createElement({
     tag: 'td',
     innerHTML: product.name,
     className: menu.purchaseNameClass,
   });
+  productName.dataset.productName = product.name;
 
-const makeProductPrice = (product, menu) =>
-  createElement({
+  return productName;
+};
+
+const makeProductPrice = (product, menu) => {
+  const productPrice = createElement({
     tag: 'td',
     innerHTML: product.price,
     className: menu.purchasePriceClass,
   });
+  productPrice.dataset.productPrice = product.price;
 
-const makeProductQuantity = (product, menu) =>
-  createElement({
+  return productPrice;
+};
+
+const makeProductQuantity = (product, menu) => {
+  const productQuantity = createElement({
     tag: 'td',
     innerHTML: product.quantity,
     className: menu.purchaseQuantityClass,
   });
+  productQuantity.dataset.productQuantity = product.quantity;
+
+  return productQuantity;
+};
 
 const makePurchaseButton = (product, menu) => {
   const productPurchaseButton = createElement({
@@ -29,6 +51,7 @@ const makePurchaseButton = (product, menu) => {
     innerHTML: menu.purchaseButton,
     className: menu.purchaseButtonClass,
   });
+  productPurchaseButton.dataset.productName = product.name;
 
   return productPurchaseButton;
 };
@@ -49,6 +72,37 @@ const makeProductStatusTableRows = menu => {
   return tableRows;
 };
 
+const refreshProductStatusTable = table => {
+  const menu = MENU('productPurchase');
+  const tableHeader = makeTableHeader(menu);
+  const tableRows = makeProductStatusTableRows(menu);
+  $(menu.chargeAmountId).innerHTML = getItemOrNull('chargeInput');
+  table.innerHTML = '';
+  appendChilds(table, tableHeader);
+  appendChilds(table, tableRows);
+  setAllPurchaseButtonEvent();
+};
+
+const purchaseProduct = button => {
+  const allProducts = getItemOrNull('products');
+  let chargeInput = getItemOrNull('chargeInput');
+  const selectedProduct = allProducts.find(e => e.name === button.dataset.productName);
+  selectedProduct.quantity -= 1;
+  chargeInput -= selectedProduct.price;
+  setChargeInput(chargeInput);
+  setAllData('products', allProducts);
+
+  const table = button.parentNode.parentElement;
+  refreshProductStatusTable(table);
+};
+
+export const setAllPurchaseButtonEvent = () => {
+  const allPurchaseButton = selectAll('purchase-button');
+  allPurchaseButton.forEach(button =>
+    button.addEventListener('click', () => purchaseProduct(button)),
+  );
+};
+
 export const makeProductStatusTable = menu => {
   const table = tableTemplate(menu);
   const tableRows = makeProductStatusTableRows(menu);
@@ -57,14 +111,6 @@ export const makeProductStatusTable = menu => {
   return table;
 };
 
-const tableRefresh = table => {
-  //   const menu = MENU('productManage');
-  //   const tableHeader = makeTableHeader(menu);
-  //   const tableRows = makeTableRows(menu);
-  //   table.innerHTML = '';
-  //   appendChilds(table, tableHeader);
-  //   appendChilds(table, tableRows);
-};
 const makeVendingMachineRow = vendingMachine =>
   vendingMachine.coins.map(row => {
     const trTag = createElement({ tag: 'tr' });
@@ -129,6 +175,6 @@ export const addChargeInput = (chargeInputDom, chargeAmountValue) => {
   } else if (chargeInput === null) {
     chargeInput = parseInt(chargeInputDom.value);
   }
-  localStorage.setItem('chargeInput', chargeInput);
+  setChargeInput(chargeInput);
   initDomProperty(chargeInputDom, chargeAmountValue);
 };

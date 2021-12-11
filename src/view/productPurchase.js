@@ -1,5 +1,10 @@
 import { $, appendChilds, createElement, getItemOrNull } from '../controller/utils.js';
-import { makeProductStatusTable, makeReturnTable, addChargeInput } from '../controller/productPurchase.js';
+import {
+  makeProductStatusTable,
+  makeReturnTable,
+  addChargeInput,
+  setAllPurchaseButtonEvent,
+} from '../controller/productPurchase.js';
 import { MENU } from '../model/constants.js';
 
 const makeChargeInput = menu => {
@@ -73,4 +78,5 @@ export default function productPurchaseView() {
   const viewContents = makeViewContents();
 
   appendChilds($container, viewContents);
+  setAllPurchaseButtonEvent();
 }

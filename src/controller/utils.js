@@ -1,7 +1,7 @@
 import { ALERT_MESSAGE } from '../model/constants.js';
 
 export const $ = id => document.getElementById(id);
-export const $class = className => document.querySelectorAll(`.${className}`);
+export const selectAll = className => document.querySelectorAll(`.${className}`);
 
 export const createElement = ({
   tag,
