@@ -111,21 +111,7 @@ export const makeProductStatusTable = menu => {
   return table;
 };
 
-const makeVendingMachineRow = vendingMachine =>
-  vendingMachine.coins.map(row => {
-    const trTag = createElement({ tag: 'tr' });
-    const coin = createElement({ tag: 'td', innerHTML: `${row.coin}원` });
-    const quantity = createElement({
-      tag: 'td',
-      innerHTML: `${row.quantity}개`,
-      className: `vending-machine-coin-${row.coin}-quantity`,
-    });
-    appendChilds(trTag, [coin, quantity]);
-
-    return trTag;
-  });
-
-const makeEmptyRow = () => {
+const makeReturnTableEmptyRows = () => {
   const emptyRows = COIN_ARRAY.map(won => {
     const trTag = createElement({ tag: 'tr' });
     const coin = createElement({ tag: 'td', innerHTML: `${won}원` });
@@ -142,24 +128,68 @@ const makeEmptyRow = () => {
   return emptyRows;
 };
 
-const makeReturnTableRows = () => {
-  const vendingMachine = getItemOrNull('vendingMachine');
-  let tableRows;
-  if (vendingMachine) {
-    tableRows = makeVendingMachineRow(vendingMachine);
-  } else if (vendingMachine === null) {
-    tableRows = makeEmptyRow();
-  }
-
-  return tableRows;
-};
-
 export const makeReturnTable = menu => {
   const table = tableTemplate(menu);
-  const tableRows = makeReturnTableRows();
+  const tableRows = makeReturnTableEmptyRows();
   appendChilds(table, tableRows);
 
   return table;
+};
+
+const getCount = x => {
+  let chargeInput = getItemOrNull('chargeInput');
+  const count = {
+    coin: x.coin,
+    quantity: 0,
+  };
+  let div = chargeInput / x.coin;
+  if (div > x.quantity) {
+    div = x.quantity;
+  }
+  chargeInput -= x.coin * div;
+  x.quantity -= div;
+  setChargeInput(chargeInput);
+  count.quantity = div;
+
+  return count;
+};
+
+const makeMinimumCoin = () => {
+  const vendingMachine = getItemOrNull('vendingMachine');
+  const minimumCoin = vendingMachine.coins.map(x => getCount(x));
+  minimumCoin.forEach(minimum => (vendingMachine.change -= minimum.coin * minimum.quantity));
+  setAllData('vendingMachine', vendingMachine);
+
+  return minimumCoin;
+};
+
+const makeReturnTableRow = minimunCoinArray =>
+  minimunCoinArray.map(row => {
+    const trTag = createElement({ tag: 'tr' });
+    const coin = createElement({ tag: 'td', innerHTML: `${row.coin}원` });
+    const quantity = createElement({
+      tag: 'td',
+      innerHTML: `${row.quantity}개`,
+    });
+    appendChilds(trTag, [coin, quantity]);
+
+    return trTag;
+  });
+
+const refreshReturnTable = (returnTable, minimunCoinArray) => {
+  const menu = MENU('return');
+  const purchaseMenu = MENU('productPurchase')
+  const tableHeader = makeTableHeader(menu);
+  const tableRows = makeReturnTableRow(minimunCoinArray);
+  returnTable.innerHTML = '';
+  $(purchaseMenu.chargeAmountId).innerHTML = getItemOrNull('chargeInput');
+  appendChilds(returnTable, tableHeader);
+  appendChilds(returnTable, tableRows);
+};
+
+export const returnChanges = returnTable => {
+  const minimunCoinArray = makeMinimumCoin();
+  refreshReturnTable(returnTable, minimunCoinArray);
 };
 
 const initDomProperty = (chargeInputDom, chargeAmountValue) => {

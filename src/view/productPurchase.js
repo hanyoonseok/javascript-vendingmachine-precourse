@@ -4,6 +4,7 @@ import {
   makeReturnTable,
   addChargeInput,
   setAllPurchaseButtonEvent,
+  returnChanges,
 } from '../controller/productPurchase.js';
 import { MENU } from '../model/constants.js';
 
@@ -40,8 +41,9 @@ const makeChargeAmountValue = (chargeAmount, menu) => {
   return chargeAmountValue;
 };
 
-const makeReturnButton = menu => {
+const makeReturnButton = (returnTable, menu) => {
   const returnButton = createElement({ tag: 'button', innerHTML: menu.coinReturnButton });
+  returnButton.addEventListener('click', () => returnChanges(returnTable));
 
   return returnButton;
 };
@@ -57,8 +59,8 @@ const makeViewContents = () => {
   const productStatusTitle = createElement({ tag: 'p', innerHTML: menu.productStatusTitle });
   const productStatusTable = makeProductStatusTable(menu);
   const returnTitle = createElement({ tag: 'p', innerHTML: returnMenu.returnTitle });
-  const returnButton = makeReturnButton(returnMenu);
   const returnTable = makeReturnTable(returnMenu);
+  const returnButton = makeReturnButton(returnTable, returnMenu);
 
   return [
     chargeInputTitle,
